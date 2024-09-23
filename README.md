@@ -1,2 +1,2 @@
 # notesworld
-my notesworld from complete web development course.
+my notesworld save school notes.
