@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes App</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Dancing+Script&display=swap');
+
+    body {
+      font-family: 'Dancing Script', cursive;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #ffffff;
+      background-image: url('https://c4.wallpaperflare.com/wallpaper/428/434/322/art-computer-digital-art-concept-art-wallpaper-thumb.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      max-width: 800px;
+      width: 90%;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 28px;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+      color: #ffcc00;
+    }
+
+    .input-container {
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #ffcc00;
+      border-radius: 5px;
+      background: #2c2c54;
+      color: #ffffff;
+      resize: vertical;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+      transition: border-color 0.3s;
+      font-family: 'Dancing Script', cursive;
+    }
+
+    textarea:focus {
+      border-color: #ff6600;
+      outline: none;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: #ff6600;
+      color: #ffffff;
+      border: 2px solid #ffcc00;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+      margin-top: 10px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+      font-family: 'Dancing Script', cursive;
+    }
+
+    button:hover {
+      background-color: #cc5200;
+      transform: scale(1.05);
+    }
+
+    .note {
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid #ffcc00;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      transition: background-color 0.3s;
+      font-family: 'Dancing Script', cursive;
+    }
+
+    .note:hover {
+      background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    .note-actions {
+      margin-top: 10px;
+    }
+
+    .note-actions button {
+      margin-right: 5px;
+      padding: 5px 10px;
+      font-size: 14px;
+      font-family: 'Dancing Script', cursive;
+    }
+
+    .note-actions button.delete-btn {
+      background-color: #dc3545;
+    }
+
+    .note-actions button.delete-btn:hover {
+      background-color: #c82333;
+    }
+
+    #notesList {
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 10px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .input-container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      textarea {
+        width: 100%;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+
+    .left-arrow {
+      display: inline-block;
+      margin: 10px;
+      cursor: pointer;
+      font-size: 24px;
+      color: #ffcc00;
+    }
+
+    .left-arrow:hover {
+      color: #ff6600;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loginContainer" class="container">
+    <h1>Login</h1>
+    <div class="input-container">
+      <input type="password" id="password" placeholder="Enter password">
+      <button onclick="checkPassword()">Login</button>
+    </div>
+  </div>
+  <div id="nameContainer" class="container" style="display: none;">
+    <h1>Enter Your Name</h1>
+    <div class="input-container">
+      <input type="text" id="userName" placeholder="Enter your name">
+      <button onclick="saveName()">Submit</button>
+    </div>
+  </div>
+  <div id="subjectContainer" class="container" style="display: none;">
+    <h1>Select a Subject</h1>
+    <div class="input-container">
+      <button onclick="selectSubject('Biology')">Biology</button>
+      <button onclick="selectSubject('Physics')">Physics</button>
+      <button onclick="selectSubject('Chemistry')">Chemistry</button>
+      <button onclick="selectSubject('Other')">Other</button>
+    </div>
+  </div>
+  <div id="notesContainer" class="container" style="display: none;">
+    <div class="left-arrow" onclick="goBack()">&#8592; Back</div>
+    <h1 id="welcomeMessage">Notes App</h1>
+    <div class="input-container">
+      <textarea id="newNote" placeholder="Write your note here..."></textarea>
+      <button onclick="saveNote()">Save Note</button>
+    </div>
+    <div id="notesList"></div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      loadNotes();
+    });
+    let selectedSubject = '';
+    const PASSWORD = '1234';
+
+    function checkPassword() {
+      const passwordInput = document.getElementById('password').value;
+      if (passwordInput === PASSWORD) {
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('nameContainer').style.display = 'block';
+      } else {
+        alert('Incorrect password');
+      }
+    }
+
+    function saveName() {
+      const userName = document.getElementById('userName').value.trim();
+      if (userName === '') {
+        alert('Please enter your name');
+        return;
+      }
+      document.getElementById('nameContainer').style.display = 'none';
+      document.getElementById('subjectContainer').style.display = 'block';
+    }
+
+    function selectSubject(subject) {
+      selectedSubject = subject;
+      document.getElementById('subjectContainer').style.display = 'none';
+      document.getElementById('notesContainer').style.display = 'block';
+      document.getElementById('welcomeMessage').textContent = `Hello, ${document.getElementById('userName').value}! Welcome to ${selectedSubject} Notes World`;
+      loadNotes();
+    }
+
+    function loadNotes() {
+      const notes = JSON.parse(localStorage.getItem(selectedSubject)) || [];
+      const notesList = document.getElementById('notesList');
+      notesList.innerHTML = '';
+      notes.forEach((note, index) => {
+        const noteElement = createNoteElement(note.title, note.content, index);
+        notesList.appendChild(noteElement);
+      });
+    }
+
+    function createNoteElement(title, content, index) {
+      const note = document.createElement('div');
+      note.classList.add('note');
+      note.innerHTML = `
+        <p class="note-title" onclick="openNoteContent('${content}')">${title}</p>
+        <div class="note-actions">
+            <button class="delete-btn" onclick="deleteNote(${index})">Delete</button>
+        </div>
+    `;
+      return note;
+    }
+
+    function saveNote() {
+      const noteInput = document.getElementById('newNote');
+      const noteContent = noteInput.value.trim();
+      if (noteContent === '') return;
+      const title = noteContent.split('\n')[0]; // First line as the title
+      const notes = JSON.parse(localStorage.getItem(selectedSubject)) || [];
+      if (notes.length >= 50) {
+        alert('Maximum of 50 notes allowed.');
+        return;
+      }
+      notes.push({
+        title,
+        content: noteContent
+      });
+      localStorage.setItem(selectedSubject, JSON.stringify(notes));
+      const notesList = document.getElementById('notesList');
+      const noteElement = createNoteElement(title, noteContent, notes.length - 1);
+      notesList.appendChild(noteElement);
+      noteInput.value = '';
+    }
+
+    function deleteNote(index) {
+      const notes = JSON.parse(localStorage.getItem(selectedSubject)) || [];
+      notes.splice(index, 1);
+      localStorage.setItem(selectedSubject, JSON.stringify(notes));
+      loadNotes();
+    }
+
+    function openNoteContent(content) {
+      alert(content); // You can replace this with a modal or another way of showing the full note content
+    }
+
+    function goBack() {
+      document.getElementById('notesContainer').style.display = 'none';
+      document.getElementById('subjectContainer').style.display = 'block';
+    }
+  </script>
+</body>
+
+</html>
+
+
